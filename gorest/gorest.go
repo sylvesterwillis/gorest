@@ -10,21 +10,15 @@ import (
     "encoding/json"
 )
 
-func panicError(err error) {
-    if err != nil {
-        panic(err)
-    }
-}
-
 /*
 Parameters: 
     headers: A map of header fields which map to their respective header value.
     url: The url to the endpoint of course.
 
 Returns:
-    A map of strings to interfaces. I chose to use interfaces in this case because 
-    I would like to keep the library as generic as possible so it's best to not
-    define a JSON stucture.
+    A map of strings to interfaces or a nil, error tuple. I chose to use interfaces 
+    in this case because I would like to keep the library as generic as possible 
+    so it's best to not define a JSON stucture.
 */
 
 func Get(headers map[string]string, url string) (interface{}) {
@@ -33,23 +27,26 @@ func Get(headers map[string]string, url string) (interface{}) {
     client := &http.Client{}
 
     req, err := http.NewRequest("GET", url, nil)
-    panicError(err)
+    if err != nil {
+        return nil, err
+    }
 
     for key, val := range headers {
         req.Header.Add(key, val)
     }
 
     resp, err := client.Do(req)
-    panicError(err)
+    if err != nil {
+        return nil, err
+    }
 
     defer resp.Body.Close()
     rawBody, err := ioutil.ReadAll(resp.Body)
-    panicError(err)
+    if err != nil {
+        return nil, err
+    }
 
-    err = json.Unmarshal(rawBody, &responseBody)
-    panicError(err)
-
-    return responseBody
+    return json.Unmarshal(rawBody, &responseBody)
 }
 
 /*
