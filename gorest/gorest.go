@@ -21,7 +21,7 @@ Returns:
     so it's best to not define a JSON stucture.
 */
 
-func Get(headers map[string]string, url string) (interface{}) {
+func Get(headers map[string]string, url string) (interface{}, error) {
     var responseBody interface{}
 
     client := &http.Client{}
@@ -46,7 +46,7 @@ func Get(headers map[string]string, url string) (interface{}) {
         return nil, err
     }
 
-    return json.Unmarshal(rawBody, &responseBody)
+    return json.Unmarshal(rawBody, &responseBody), nil
 }
 
 /*
